@@ -1,6 +1,5 @@
 package tacos.controller;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -9,12 +8,14 @@ import org.springframework.web.bind.annotation.*;
 import tacos.model.Ingredient;
 import tacos.model.Taco;
 import tacos.model.TacoOrder;
+import tacos.model.TacoUDT;
 import tacos.repository.IngredientRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Slf4j
+
 @Controller
 @RequestMapping("/design")
 @SessionAttributes("tacoOrder")
@@ -28,11 +29,13 @@ public class DesignTacoController {
 
     @ModelAttribute
     public void addIngredientsToModel (Model model) {
-        Iterable<Ingredient> ingredients = ingredientRepository.findAll();
+        List<Ingredient> ingredients = new ArrayList<>();
+        ingredientRepository.findAll().forEach(i -> ingredients.add(i));
+
         Ingredient.Type[] types = Ingredient.Type.values();
         for (Ingredient.Type type : types) {
             model.addAttribute(type.toString().toLowerCase(),
-                    filteredByType((List<Ingredient>) ingredients, type));
+                    filteredByType(ingredients, type));
         }
     }
 
@@ -65,8 +68,7 @@ public class DesignTacoController {
             return "desing";
         }
 
-        tacoOrder.addTaco(taco);
-        log.info("Processing taco: {}", taco);
+        tacoOrder.addTaco(new TacoUDT(taco.getName(), taco.getIngredients()));
 
         return "redirect:/orders/current";
     }
