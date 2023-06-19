@@ -9,7 +9,7 @@ div.ingredient-group:nth-child(even) {
 }
 
 div.ingredient-group {
-    width: 30%;
+    width: 50%;
 }
 
 .grid:after {
