@@ -14,6 +14,7 @@ import java.util.List;
 
 @Data
 @Entity
+@Table (name = "Taco_order")
 public class TacoOrder implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -54,5 +55,8 @@ public class TacoOrder implements Serializable {
     public void addTaco(Taco taco) {
         tacos.add(taco);
     }
+
+    @ManyToOne
+    private User user;
 
 }
