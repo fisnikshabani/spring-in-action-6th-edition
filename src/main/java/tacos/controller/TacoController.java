@@ -1,17 +1,15 @@
 package tacos.controller;
 
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import tacos.model.Taco;
 import tacos.model.TacoOrder;
 import tacos.repository.OrderRepository;
 import tacos.repository.TacoRepository;
 
-import java.util.Optional;
 
 @RestController
 @RequestMapping (path = "/api/tacos", produces = "application/json")
@@ -27,23 +25,19 @@ public class TacoController {
     }
 
     @GetMapping(params = "recent")
-    public Iterable<Taco> recentTacos() {
-
-        PageRequest page = PageRequest.of(0, 12, Sort.by("createdAt").descending());
-
-        return tacoRepository.findAll(page).getContent();
+    public Flux<Taco> recentTacos() {
+        return tacoRepository.findAll().take(12);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Taco> tacoById(@PathVariable("id") Long id) {
-        Optional<Taco> optionalTaco = tacoRepository.findById(id);
-        return optionalTaco.map(taco -> new ResponseEntity<>(taco, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(null, HttpStatus.NOT_FOUND));
+    public Mono<Taco> tacoById(@PathVariable("id") Long id) {
+        return tacoRepository.findById(id);
     }
 
     @PostMapping(consumes = "application/json")
     @ResponseStatus(HttpStatus.CREATED)
-    public Taco postTaco(@RequestBody Taco taco) {
-        return tacoRepository.save(taco);
+    public Mono<Taco> postTaco(@RequestBody Mono<Taco> tacoMono) {
+        return tacoMono.flatMap(tacoRepository::save);
     }
 
     @PatchMapping(path = "/{orderId}", consumes = "application/json")
