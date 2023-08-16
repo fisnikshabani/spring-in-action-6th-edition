@@ -1,0 +1,23 @@
+management:
+    endpoints:
+        web:
+            exposure:
+                include: health, info, beans, conditions, heapdump, loggers
+    endpoint:
+      health:
+          show-details: always
+
+spring:
+    datasource:
+        generate-unique-name: false
+        name: tacocloud
+    jpa:
+        properties:
+            hibernate:
+                globally_quoted_identifiers: true
+    sql:
+        init:
+            mode: always
+    thymeleaf:
+        cache: false
+
